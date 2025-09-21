@@ -1,0 +1,201 @@
+class PurchaseOrderSystem:
+    def __init__(self):
+        """
+        initializes all attributes for the purchase order system.
+        design principle used: encapsulation – all related data is stored inside the class.
+        future improvement: could secure private attributes with getters/setters for more control.
+        """
+        self.total_amount = 0
+        self.order_date = ""
+        self.customer_id = ""
+        self.customer_name = ""
+        self.order_status = ""
+        self.order_id = ""
+        self.total_orders = 0
+        self.total_approved = 0
+        self.total_pending = 0
+        self.total_rejected = 0
+        self.unique_id = 0
+        self.reference_no = ""
+
+    def customer_info(self):
+        """
+        collects and validates customer information.
+        design principle used: single responsibility principle (SRP) – only handles customer info input.
+        """
+        print("------------")
+        while True:
+            self.order_date = input("Enter the order date (DD/MM/YYYY): ")
+            if self.order_date == "":
+                print("Date cannot be empty. Please re-enter.")
+            else:
+                break
+
+        while True:
+            self.customer_id = input("Enter customer ID: ")
+            if self.customer_id == "":
+                print("Customer ID cannot be empty. Please re-enter.")
+            else:
+                break
+
+        while True:
+            self.customer_name = input("Enter full name: ")
+            if self.customer_name == "":
+                print("Customer name cannot be empty. Please re-enter.")
+            else:
+                break
+
+        # Generate unique order ID
+        self.unique_id += 1
+        self.order_id = str(2000 + self.unique_id)
+        self.short_id = self.order_id[-3:]
+
+        # Display collected info
+        print("Customer Information:")
+        print(f"Date: {self.order_date}")
+        print(f"Customer ID: {self.customer_id}")
+        print(f"Customer Name: {self.customer_name}")
+        print(f"Order ID: {self.order_id}")
+        print("------------")
+        return self.order_date, self.customer_id, self.customer_name, self.order_id, self.short_id
+
+    def order_items(self):
+        """
+        collects item details and calculates total amount.
+        design principle: SRP – focuses only on item entry and cost calculation.
+        """
+        print("------------")
+        self.total_amount = 0
+        try:
+            items = int(input("How many items are you ordering? "))
+        except ValueError:
+            items = 1
+
+        for i in range(1, items + 1):
+            while True:
+                item_name = input(f"Enter name of item {i}: ")
+                if item_name == "":
+                    print("Item name cannot be empty. Enter again.")
+                else:
+                    break
+
+            item_cost = ""
+            while item_cost == "":
+                try:
+                    item_cost = float(input(f"Enter cost of item {i}: "))
+                except ValueError:
+                    print("Invalid cost. Enter a number.")
+                    continue
+            self.total_amount += item_cost
+            print(f"{item_name} - ${item_cost}")
+
+        print(f"Total Amount: ${self.total_amount}")
+        self.total_orders += 1
+        print("------------")
+        return self.total_amount
+
+    def approve_order(self):
+        """
+        determines approval status based on total amount.
+        design principle used: Open/Closed principle – approval rules can be extended without modifying structure.
+        """
+        print("------------")
+        if self.total_amount <= 1000:
+            self.order_status = "Approved"
+            self.total_approved += 1
+            self.reference_no = self.customer_id + self.short_id
+            print(f"Status: {self.order_status}")
+            print(f"Reference Number: {self.reference_no}")
+        else:
+            self.order_status = "Pending"
+            self.total_pending += 1
+            print(f"Status: {self.order_status}")
+            print("Reference Number: -----")
+        print("------------")
+        return self.total_amount, self.reference_no
+
+    def respond_order(self):
+        """
+        handles pending order responses from customer.
+        design principle used: Separation of Concerns – only deals with responding to pending orders.
+        """
+        print("------------")
+        if self.order_status.lower() == "pending":
+            response = input("Do you want to confirm the pending order? (Yes/No): ")
+            if response.lower() == "yes":
+                self.order_status = "Approved"
+                self.total_approved += 1
+                self.reference_no = self.customer_id + self.short_id
+                print(f"Status: {self.order_status}")
+                print(f"Reference Number: {self.reference_no}")
+            else:
+                self.order_status = "Rejected"
+                self.total_rejected += 1
+                self.reference_no = "-----"
+                print(f"Status: {self.order_status}")
+                print(f"Reference Number: {self.reference_no}")
+        print("------------")
+        return self.order_status, self.reference_no
+
+    def display_order(self):
+        """
+        displays the details of the current order.
+        design principle used: SRP – only responsible for outputting order details.
+        """
+        print("------------")
+        print("Order Details:")
+        print(f"Date: {self.order_date}")
+        print(f"Order ID: {self.order_id}")
+        print(f"Customer ID: {self.customer_id}")
+        print(f"Customer Name: {self.customer_name}")
+        print(f"Total Amount: ${self.total_amount}")
+        print(f"Status: {self.order_status}")
+        print(f"Reference Number: {self.reference_no}")
+        print("------------")
+
+    def order_statistics(self):
+        """
+        displays statistics of all orders processed.
+        design principle: information expert – the class holds and reports its own statistics.
+        """
+        print("------------")
+        print(f"Total Orders Submitted: {self.total_orders}")
+        print(f"Total Approved Orders: {self.total_approved}")
+        print(f"Total Pending Orders: {self.total_pending}")
+        print(f"Total Rejected Orders: {self.total_rejected}")
+        print("------------")
+
+
+# Create a single instance
+system = PurchaseOrderSystem()
+
+def main():
+    """
+    main workflow for processing an order.
+    design principle used: high cohesion – groups related steps together in a logical sequence.
+    """
+    system.customer_info()
+    system.order_items()
+    system.approve_order()
+    system.respond_order()
+    system.display_order()
+
+
+# Menu loop
+while True:
+    print("1. Add Customer Order")
+    print("2. Display Order Statistics")
+    print("3. Exit")
+    try:
+        choice = int(input("Enter choice: "))
+        if choice == 1:
+            main()
+        elif choice == 2:
+            system.order_statistics()
+        elif choice == 3:
+            break
+        else:
+            print("Invalid choice. Try again.")
+    except ValueError:
+        print("Invalid input. Enter a number.")
+    print("-------")
