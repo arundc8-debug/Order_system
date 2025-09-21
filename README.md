@@ -30,7 +30,7 @@ The DRY principle is that one should not repeat the same code and instead, one s
 • The program does not repeat itself in certain areas.
 • Still, there is repeated input validation (e.g. verification of empty strings).
 
-### 4. 4. Open/Closed Principle
+###  4. Open/Closed Principle
   The code must be open to new features but closed to changing old code so,you can add new functionality without disrupting the functionality of the existing one.
 • New approval levels or rules may also be added in requisition approval without affecting the structure of the method.
 This ensures that the system is more adaptable and simple to maintain.
